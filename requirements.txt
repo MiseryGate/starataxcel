@@ -5,17 +5,9 @@ pandas
 seaborn
 scikit-learn
 openpyxl
-joblib
-pprint
-pyvis
 plotly
 streamlit_option_menu
 pycaret
-weatherapi
-langchain
-langchain_groq
-speech_recognition
-pyaudio
 geopandas
 folium
 geopy
