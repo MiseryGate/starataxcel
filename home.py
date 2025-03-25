@@ -27,7 +27,8 @@ from streamlit_folium import st_folium
 
 # Read The Data
 data = pd.read_csv('./combined_data.csv')
-
+# Set Streamlit layout to wide
+st.set_page_config(layout="wide", page_title="StrataXcel15", page_icon=🏢)
 #Menu
 menu = option_menu(None, ["Home","Descriptive Statistic","Clustering"], 
     icons=['house', 'bar-chart-steps','buildings'], 
