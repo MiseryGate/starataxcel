@@ -13,3 +13,5 @@ folium
 geopy
 shapely
 streamlit_folium
+networkx
+osmnx
