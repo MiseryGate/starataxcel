@@ -41,7 +41,7 @@ menu = option_menu(None, ["Home","Dashboard","Descriptive Statistic","Clustering
         "nav-link-selected": {"background-color": "blue"},
     })
 if menu == "Home":
-    st.header("Hello, user 😃")
+    st.header("Hello, client 😃")
     st.subheader("This project is presented by :blue[Group 15] ", divider="gray")
     st.subheader("Bramanti Brillianto", divider="blue")
     st.subheader("Darmawan Sidiq", divider="green")
