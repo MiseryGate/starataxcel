@@ -278,7 +278,7 @@ if menu == "Clustering":
     # Add Points to the Map
     marker_cluster = MarkerCluster().add_to(m)
 
-    for idx, row in data.iterrows():
+    for idx, row in data_viz.iterrows():
         folium.CircleMarker(
             location=[row['lat'], row['long']],
             radius=7,
