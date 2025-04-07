@@ -266,21 +266,21 @@ if menu == "Clustering":
     k = 4
 
     kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-    data['Cluster'] = kmeans.fit_predict(data[['Lat', 'Long']])
+    data_viz['Cluster'] = kmeans.fit_predict(data_viz[['lat', 'long']])
 
     # Define Colors for Clusters
     colors = ['red', 'blue', 'green', 'purple', 'orange']
-    data['Color'] = data['Cluster'].apply(lambda x: colors[x])
+    data_viz['Color'] = data_viz['Cluster'].apply(lambda x: colors[x])
 
     # Create a Folium Map
-    m = folium.Map(location=[data['Lat'].mean(), data['Long'].mean()], zoom_start=14)
+    m = folium.Map(location=[data_viz['lat'].mean(), data_viz['long'].mean()], zoom_start=14)
 
     # Add Points to the Map
     marker_cluster = MarkerCluster().add_to(m)
 
     for idx, row in data.iterrows():
         folium.CircleMarker(
-            location=[row['Lat'], row['Long']],
+            location=[row['lat'], row['long']],
             radius=7,
             color=row['Color'],
             fill=True,
