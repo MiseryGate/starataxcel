@@ -27,10 +27,11 @@ from streamlit_folium import st_folium
 
 # Read The Data
 data = pd.read_csv('./combined_data.csv')
+data_viz = pd.read_csv('./lot_size.csv')
 # Set Streamlit layout to wide
 st.set_page_config(layout="wide", page_title="StrataXcel15", page_icon="./building.ico")
 #Menu
-menu = option_menu(None, ["Home","Descriptive Statistic","Clustering"], 
+menu = option_menu(None, ["Home","Dashboard","Descriptive Statistic","Clustering"], 
     icons=['house', 'bar-chart-steps','buildings'], 
     menu_icon="cast", default_index=0, orientation="horizontal",
     styles={
@@ -46,6 +47,91 @@ if menu == "Home":
     st.subheader("Darmawan Sidiq", divider="green")
     st.subheader("Ibnu Pujiono", divider="orange")
     st.subheader("M. Faisal Zulmy", divider="red")
+if menu == "Dashboard":
+    st.header("Dashboard")
+    grouped_sorted = data_viz
+    #Sankey Viz
+    import plotly.graph_objects as go
+
+    # Create all nodes: combine council_area, zone, property_type, lot_size
+    all_nodes = list(pd.unique(grouped_sorted['council_area'].tolist() +
+                                grouped_sorted['development_zone_base'].tolist() +
+                                grouped_sorted['property_type'].tolist() +
+                                grouped_sorted['lot_size'].tolist()))
+    node_indices = {name: i for i, name in enumerate(all_nodes)}
+
+    # Generate colors for the nodes
+    council_colors = ['#FF5733', '#FFC300', '#DAF7A6', '#C70039', '#900C3F', '#581845', '#2980B9', '#8E44AD']
+    zone_colors = ['#1F618D', '#D35400', '#7D3C98', '#27AE60', '#E74C3C', '#F39C12']
+    property_colors = ['#3498DB', '#2ECC71', '#9B59B6', '#F1C40F', '#E67E22', '#1ABC9C']
+    lot_size_colors = {'Large': '#2E86C1', 'Medium': '#58D68D', 'Small': '#F7DC6F'}
+
+    # Create links for council_area → zone
+    links_council_zone = grouped_sorted.groupby(['council_area', 'development_zone_base'])['property_count'].sum().reset_index()
+    links_council_zone['source'] = links_council_zone['council_area'].map(node_indices)
+    links_council_zone['target'] = links_council_zone['development_zone_base'].map(node_indices)
+
+    # Create links for zone → property_type
+    links_zone_type = grouped_sorted.groupby(['development_zone_base', 'property_type'])['property_count'].sum().reset_index()
+    links_zone_type['source'] = links_zone_type['development_zone_base'].map(node_indices)
+    links_zone_type['target'] = links_zone_type['property_type'].map(node_indices)
+
+    # Create links for property_type → lot_size
+    links_type_lot = grouped_sorted.groupby(['property_type', 'lot_size'])['property_count'].sum().reset_index()
+    links_type_lot['source'] = links_type_lot['property_type'].map(node_indices)
+    links_type_lot['target'] = links_type_lot['lot_size'].map(node_indices)
+
+    # Combine all link sets
+    sources = links_council_zone['source'].tolist() + links_zone_type['source'].tolist() + links_type_lot['source'].tolist()
+    targets = links_council_zone['target'].tolist() + links_zone_type['target'].tolist() + links_type_lot['target'].tolist()
+    values = links_council_zone['property_count'].tolist() + links_zone_type['property_count'].tolist() + links_type_lot['property_count'].tolist()
+
+    # Create a color array for the links: alternating between different zones and property types
+    link_colors = []
+    for idx, (source, target) in enumerate(zip(sources, targets)):
+        if all_nodes[source] in council_colors:
+            link_colors.append('#1F618D')  # Color for council_area to zone links
+        elif all_nodes[source] in zone_colors:
+            link_colors.append('#E74C3C')  # Color for zone to property type links
+        else:
+            link_colors.append('#F7DC6F')  # Color for property_type to lot_size links
+
+    # Build the Sankey diagram
+    fig = go.Figure(data=[go.Sankey(
+        node=dict(
+            pad=20,
+            thickness=20,
+            line=dict(color="black", width=0.5),
+            label=all_nodes,
+            color=[council_colors[i % len(council_colors)] if all_nodes[i] in council_colors
+                else zone_colors[i % len(zone_colors)] if all_nodes[i] in zone_colors
+                else lot_size_colors.get(all_nodes[i], '#9B59B6') for i in range(len(all_nodes))]
+        ),
+        link=dict(
+            source=sources,
+            target=targets,
+            value=values,
+            color=link_colors
+        )
+    )])
+
+    fig.update_layout(title_text="🏗️ Property Categorization: Council Area → Zone → Property Type → Lot Size", font_size=12)
+    st.plotly_chart(fig)
+    council_select = st.sidebar.selectbox("Choose Council Area",grouped_sorted["council_area"].unique())
+    st.sidebar.write("Council Area : ",council_select)
+
+    #Filter Data
+    data_filter = grouped_sorted[grouped_sorted["council_area"] == council_select]
+    fig = px.pie(data_filter, values='property_count', names='development_zone_base', title='Property Development Area in ' + council_select)
+    st.plotly_chart(fig)
+    col1, col2 = st.columns(2)
+    with col1:
+        fig = px.pie(data_filter, values='property_count', names='suburb', title='Suburb location in ' + council_select)
+        st.plotly_chart(fig)
+    with col2:
+        fig = px.pie(data_filter, values='property_count', names='lot_size', title='Lot Size in ' + council_select)
+        st.plotly_chart(fig)
+    
 if menu == "Descriptive Statistic":
     st.title("Descriptive Statistics")
     st.write(data.head())
