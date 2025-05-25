@@ -658,9 +658,9 @@ if menu == "Chatbot":
     llm = ChatGroq(temperature=0, model="llama-3.2-90b-text-preview", api_key=groq_api_key)
     #llm = ChatOpenAI(model="gpt-4-turbo", temperature=0,api_key=openai_api_key)
     agent = create_csv_agent(llm, "./completed_data_stratxcel.csv", verbose=True, allow_dangerous_code=True, max_execution_time=1000000000000000)
-
-    # Toggle for input mode: Text or Speech
-    
+    def query_data(query):
+        response = agent.invoke(query)
+        return response
     input_mode = st.selectbox("Choose your input method:", ("Text", "Speech"))
     user_query = None
     if input_mode == "Text":
@@ -688,7 +688,7 @@ if menu == "Chatbot":
                 st.markdown(user_query)
             
             with st.chat_message("AI"):
-                response = st.write_stream(get_response(user_query))
+                response = st.write_stream(query_data(user_query))
             
             st.session_state.chat_history.append(AIMessage(content=response))
     else:
