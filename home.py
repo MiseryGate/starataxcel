@@ -663,7 +663,7 @@ if menu == "Chatbot":
     verbose=True,
     handle_parsing_errors=True,
     allow_dangerous_code=True,
-    system_message="You are a real estate investment expert. Recommend the best suburbs based on capital growth and affordability using available columns like 'saleslastsoldprice', 'suburb', etc."
+    system_message="You are a real estate expertise in managing small and medium scale strata. Gives recommendation and answer based on the related data and using a statsmodel when you ask some relationship or any statistical method appropriate for user query"
 )
     def query_data(query):
         response = agent.invoke(query)
