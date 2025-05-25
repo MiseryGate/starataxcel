@@ -34,7 +34,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from audio_recorder_streamlit import audio_recorder
 
 #Deployment Key
-openai_api_key = st.secrets["OPENAI_API_KEY"]
+#openai_api_key = st.secrets["OPENAI_API_KEY"]
 groq_api_key = st.secrets["GROQ_API_KEY"]
 # Read The Data
 data = pd.read_csv('./combined_data.csv')
