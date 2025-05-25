@@ -695,9 +695,17 @@ if menu == "Chatbot":
                 st.markdown(user_query)
             
             with st.chat_message("AI"):
-                response = st.write_stream(query_data(user_query))
-            
-            st.session_state.chat_history.append(AIMessage(content=response))
+                raw_response = query_data(user_query)
+
+                if isinstance(raw_response, dict) and 'output' in raw_response:
+                    response_text = raw_response['output']
+                elif isinstance(raw_response, str):
+                    response_text = raw_response
+                else:
+                    response_text = "Sorry, I couldn't generate a useful answer."
+
+                st.chat_message("AI").markdown(response_text)
+                st.session_state.chat_history.append(AIMessage(content=response_text))
     else:
         st.write("Click the button to record your speech:")
         audio_bytes = audio_recorder()  # Record audio using audio-recorder-streamlit
