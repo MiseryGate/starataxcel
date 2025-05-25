@@ -657,7 +657,7 @@ if menu == "Mapping Strata":
 if menu == "Chatbot":
     llm = ChatGroq(temperature=0, model="llama-3.2-90b-text-preview", api_key=groq_api_key)
     #llm = ChatOpenAI(model="gpt-4-turbo", temperature=0,api_key=openai_api_key)
-    agent = create_csv_agent(llm, [df], verbose=True, allow_dangerous_code=True, max_execution_time=1000000000000000)
+    agent = create_csv_agent(llm, df, verbose=True, allow_dangerous_code=True, max_execution_time=1000000000000000)
 
     # Toggle for input mode: Text or Speech
     analysis_mode = st.selectbox("Choose an ability of the agent:",("Analysis of each Country","Free Prompt"))
