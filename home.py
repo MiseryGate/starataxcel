@@ -704,7 +704,9 @@ if menu == "Chatbot":
                 else:
                     response_text = "Sorry, I couldn't generate a useful answer."
 
-                st.chat_message("AI").markdown(response_text)
+                with st.chat_message("AI"):
+                    st.markdown(response_text)
+
                 st.session_state.chat_history.append(AIMessage(content=response_text))
     else:
         st.write("Click the button to record your speech:")
