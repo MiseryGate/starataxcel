@@ -691,23 +691,29 @@ if menu == "Chatbot":
         if user_query is not None and user_query != "":
             st.session_state.chat_history.append(HumanMessage(content=user_query))
             
-            with st.chat_message("Human"):
-                st.markdown(user_query)
-            
-            with st.chat_message("AI"):
-                raw_response = query_data(user_query)
+            if user_query is not None and user_query.strip() != "":
+                # Show human message
+                with st.chat_message("Human"):
+                    st.markdown(user_query)
 
-                if isinstance(raw_response, dict) and 'output' in raw_response:
-                    response_text = raw_response['output']
-                elif isinstance(raw_response, str):
-                    response_text = raw_response
-                else:
-                    response_text = "Sorry, I couldn't generate a useful answer."
+                # Process response
+                try:
+                    raw_response = query_data(user_query)
+                    if isinstance(raw_response, dict) and 'output' in raw_response:
+                        response_text = raw_response['output']
+                    elif isinstance(raw_response, str):
+                        response_text = raw_response
+                    else:
+                        response_text = "Sorry, I couldn't generate a useful answer."
 
+                except Exception as e:
+                    import traceback
+                    response_text = "An internal error occurred:\n" + traceback.format_exc()
+
+                # Show AI response
                 with st.chat_message("AI"):
                     st.markdown(response_text)
 
-                st.session_state.chat_history.append(AIMessage(content=response_text))
     else:
         st.write("Click the button to record your speech:")
         audio_bytes = audio_recorder()  # Record audio using audio-recorder-streamlit
