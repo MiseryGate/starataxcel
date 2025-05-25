@@ -660,66 +660,65 @@ if menu == "Chatbot":
     agent = create_csv_agent(llm, "./completed_data_stratxcel.csv", verbose=True, allow_dangerous_code=True, max_execution_time=1000000000000000)
 
     # Toggle for input mode: Text or Speech
-    analysis_mode = st.selectbox("Choose an ability of the agent:",("Analysis of each Country","Free Prompt"))
-    if analysis_mode == "Free Prompt":
-        input_mode = st.selectbox("Choose your input method:", ("Text", "Speech"))
-        user_query = None
-        if input_mode == "Text":
-            user_query = st.chat_input("Type your message here...")
-            if "context_log" not in st.session_state:
-                st.session_state.context_log = ["Retrieved context will be displayed here"]
-            if "chat_history" not in st.session_state:
-                st.session_state.chat_history = [AIMessage(content="Hi, I'm a friendly assistant. How can I help you?")]
-            result = st.toggle("Toggle Context")
-            if result:
-                st.write(st.session_state.context_log)
+    
+    input_mode = st.selectbox("Choose your input method:", ("Text", "Speech"))
+    user_query = None
+    if input_mode == "Text":
+        user_query = st.chat_input("Type your message here...")
+        if "context_log" not in st.session_state:
+            st.session_state.context_log = ["Retrieved context will be displayed here"]
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = [AIMessage(content="Hi, I'm a friendly assistant. How can I help you?")]
+        result = st.toggle("Toggle Context")
+        if result:
+            st.write(st.session_state.context_log)
 
 
-            for message in st.session_state.chat_history:
-                if isinstance(message, AIMessage):
-                    with st.chat_message("AI"):
-                        st.write(message.content)
-                elif isinstance(message, HumanMessage):
-                    with st.chat_message("Human"):
-                        st.write(message.content)
-            if user_query is not None and user_query != "":
-                st.session_state.chat_history.append(HumanMessage(content=user_query))
-                
-                with st.chat_message("Human"):
-                    st.markdown(user_query)
-                
+        for message in st.session_state.chat_history:
+            if isinstance(message, AIMessage):
                 with st.chat_message("AI"):
-                    response = st.write_stream(get_response(user_query))
-                
-                st.session_state.chat_history.append(AIMessage(content=response))
-        else:
-            st.write("Click the button to record your speech:")
-            audio_bytes = audio_recorder()  # Record audio using audio-recorder-streamlit
-            if audio_bytes:
-                st.audio(audio_bytes, format="audio/wav")  # Playback the recorded audio
-                # Process audio for speech-to-text (if needed, using an external API like Google or OpenAI Whisper)
-                # Example: Convert audio to text using Google Speech Recognition or any other service.
-                try:
-                    from io import BytesIO
-                    import speech_recognition as sr
+                    st.write(message.content)
+            elif isinstance(message, HumanMessage):
+                with st.chat_message("Human"):
+                    st.write(message.content)
+        if user_query is not None and user_query != "":
+            st.session_state.chat_history.append(HumanMessage(content=user_query))
+            
+            with st.chat_message("Human"):
+                st.markdown(user_query)
+            
+            with st.chat_message("AI"):
+                response = st.write_stream(get_response(user_query))
+            
+            st.session_state.chat_history.append(AIMessage(content=response))
+    else:
+        st.write("Click the button to record your speech:")
+        audio_bytes = audio_recorder()  # Record audio using audio-recorder-streamlit
+        if audio_bytes:
+            st.audio(audio_bytes, format="audio/wav")  # Playback the recorded audio
+            # Process audio for speech-to-text (if needed, using an external API like Google or OpenAI Whisper)
+            # Example: Convert audio to text using Google Speech Recognition or any other service.
+            try:
+                from io import BytesIO
+                import speech_recognition as sr
 
-                    recognizer = sr.Recognizer()
-                    with sr.AudioFile(BytesIO(audio_bytes)) as source:
-                        audio = recognizer.record(source)
-                        user_query = recognizer.recognize_google(audio)  # Convert speech to text
-                        st.write("Recognized Text:", user_query)
+                recognizer = sr.Recognizer()
+                with sr.AudioFile(BytesIO(audio_bytes)) as source:
+                    audio = recognizer.record(source)
+                    user_query = recognizer.recognize_google(audio)  # Convert speech to text
+                    st.write("Recognized Text:", user_query)
 
-                except Exception as e:
-                    st.write("Could not process audio:", str(e))
+            except Exception as e:
+                st.write("Could not process audio:", str(e))
 
-            if user_query is not None and user_query != "":
-                st.chat_message('user').markdown(user_query)
-                st.session_state.messages.append({'role': 'user', 'content': user_query})
-                with st.spinner("Thinking...and Calculating"):
-                    response = agent.invoke(user_query)
-                # Display the assistant's response
-                st.chat_message('assistant').markdown(response['output'])
-                st.session_state.messages.append({'role': 'assistant', 'content': response['output']})
+        if user_query is not None and user_query != "":
+            st.chat_message('user').markdown(user_query)
+            st.session_state.messages.append({'role': 'user', 'content': user_query})
+            with st.spinner("Thinking...and Calculating"):
+                response = agent.invoke(user_query)
+            # Display the assistant's response
+            st.chat_message('assistant').markdown(response['output'])
+            st.session_state.messages.append({'role': 'assistant', 'content': response['output']})
 # Footer
 st.markdown("---")
 st.markdown("Built with love and passion ❤‍🔥 from Group 15")
