@@ -657,7 +657,7 @@ if menu == "Mapping Strata":
 if menu == "Chatbot":
     llm = ChatGroq(temperature=0, model="llama3-70b-8192", api_key=groq_api_key)
     #llm = ChatOpenAI(model="gpt-4-turbo", temperature=0,api_key=openai_api_key)
-    agent = create_csv_agent(llm, "./completed_data_stratxcel.csv", verbose=True, allow_dangerous_code=True, max_execution_time=1000000000000000)
+    agent = create_csv_agent(llm, "./completed_data_stratxcel.csv", verbose=True, allow_dangerous_code=True, max_execution_time=1000000000000000,handle_parsing_errors=True)
     def query_data(query):
         response = agent.invoke(query)
         return response
