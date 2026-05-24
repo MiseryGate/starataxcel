@@ -42,6 +42,85 @@ groq_api_key = st.secrets["GROQ_API_KEY"]
 data = pd.read_csv('./combined_data.csv')
 data_viz = pd.read_csv('./lot_size.csv')
 df = pd.read_csv('./completed_data_stratxcel.csv')
+
+# ─── LOGIN SECTION ─── INSERT HERE ───────────────────────────────────────────
+
+def check_credentials(username, password):
+    valid_user = st.secrets["credentials"]["username"]
+    valid_pass = st.secrets["credentials"]["password"]
+    return username == valid_user and password == valid_pass
+
+def render_login_page():
+    st.markdown("""
+    <style>
+    [data-testid="stAppViewContainer"] {
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    }
+    [data-testid="stHeader"] { background: transparent; }
+    .block-container { padding-top: 3rem; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1, 1.2, 1])
+    with col2:
+        st.markdown("""
+        <div style="
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 2.5rem 2rem 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            margin-top: 2rem;
+        ">
+            <div style="text-align:center; margin-bottom: 1.5rem;">
+                <div style="
+                    background: linear-gradient(135deg, #4ECDC4, #2196F3);
+                    border-radius: 50%;
+                    width: 72px; height: 72px;
+                    display: flex; align-items: center; justify-content: center;
+                    margin: 0 auto 1rem;
+                    font-size: 32px;
+                ">🏢</div>
+                <h2 style="color: white; margin: 0; font-size: 1.6rem; font-weight: 600;">StrataXcel15</h2>
+                <p style="color: rgba(255,255,255,0.55); margin: 0.3rem 0 0; font-size: 0.9rem;">
+                    Strata Property Intelligence Platform
+                </p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        with st.form("login_form"):
+            st.markdown("<p style='color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.2rem;'>Username</p>", unsafe_allow_html=True)
+            username = st.text_input("Username", placeholder="Enter username", label_visibility="collapsed")
+
+            st.markdown("<p style='color: rgba(255,255,255,0.7); font-size: 0.85rem; margin: 0.8rem 0 0.2rem;'>Password</p>", unsafe_allow_html=True)
+            password = st.text_input("Password", type="password", placeholder="Enter password", label_visibility="collapsed")
+
+            st.markdown("<div style='height: 0.8rem'></div>", unsafe_allow_html=True)
+            submitted = st.form_submit_button("Sign In →", use_container_width=True)
+
+            if submitted:
+                if check_credentials(username, password):
+                    st.session_state["authenticated"] = True
+                    st.rerun()
+                else:
+                    st.error("⚠️ Invalid username or password. Please try again.")
+
+        st.markdown("""
+        <p style="text-align:center; color: rgba(255,255,255,0.3); font-size: 0.75rem; margin-top: 1.5rem;">
+            © 2024 StrataXcel15 · Group 15
+        </p>
+        """, unsafe_allow_html=True)
+
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+if not st.session_state["authenticated"]:
+    render_login_page()
+    st.stop()
+
+# ─── END LOGIN SECTION ────────────────────────────────────────────────────────
 # Set Streamlit layout to wide
 st.set_page_config(layout="wide", page_title="StrataXcel15", page_icon="./building.ico")
 #Menu
