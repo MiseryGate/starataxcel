@@ -433,7 +433,10 @@ if menu == "Dashboard":
     
     # Sidebar for filters
     st.sidebar.header("🔍 Filters")
-    
+    if st.sidebar.button("🚪 Logout"):
+        st.session_state["authenticated"] = False
+        st.rerun()
+    st.sidebar.markdown("---")
     # Get unique values for filters
     unique_councils = sorted(df['councilarea'].unique())
     unique_suburbs = sorted(df['addresssuburb'].unique())
